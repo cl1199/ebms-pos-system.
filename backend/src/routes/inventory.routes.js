@@ -1,13 +1,13 @@
 import { Router } from "express";
+import { authRequired } from "../middleware/auth.middleware.js";
 import {
-  createInitialInventory
+  getInventoryByBar,
+  getInventoryHistory,
 } from "../controllers/inventory.controller.js";
-
-import { authRequired, adminOnly } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-// ADMIN define inventario inicial
-router.post("/initial", authRequired, adminOnly, createInitialInventory);
+router.get("/bar/:eventId/:barId", authRequired, getInventoryByBar);
+router.get("/history/:eventId/:barId", authRequired, getInventoryHistory);
 
 export default router;

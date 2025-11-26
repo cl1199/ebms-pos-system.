@@ -9,7 +9,7 @@ import {
 
 const router = Router();
 
-// Usamos siempre ?eventId=#
+// Todas usan ?eventId=#
 router.get("/sales/summary", authRequired, getSalesSummary);
 router.get("/sales/by-bar", authRequired, getSalesByBar);
 router.get("/sales/top-products", authRequired, getTopProducts);

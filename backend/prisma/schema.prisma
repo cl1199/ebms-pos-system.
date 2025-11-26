@@ -1,0 +1,188 @@
+// =====================
+//   Prisma + PostgreSQL
+// =====================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ======= USER =======
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         UserRole
+  createdAt    DateTime   @default(now())
+
+  // Relations
+  sales        Sale[]
+  adjustments  InventoryAdjustment[]
+  waiterAssignments WaiterAssignment[]
+}
+
+enum UserRole {
+  ADMIN
+  CASHIER
+  WAITER
+  SUPERVISOR
+}
+
+// ======= EVENT =======
+model Event {
+  id        Int       @id @default(autoincrement())
+  name      String
+  date      DateTime?
+  location  String?
+  status    EventStatus @default(ACTIVE)
+  createdAt DateTime @default(now())
+
+  bars      Bar[]
+  sales     Sale[]
+  inventory InventoryItem[]
+  adjustments InventoryAdjustment[]
+  waiterAssignments WaiterAssignment[]
+}
+
+enum EventStatus {
+  ACTIVE
+  CLOSED
+  CANCELLED
+}
+
+// ======= BAR =======
+model Bar {
+  id        Int      @id @default(autoincrement())
+  name      String
+  location  String?
+
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   Int
+
+  sales     Sale[]
+  inventory InventoryItem[]
+  waiterAssignments WaiterAssignment[]
+
+  adjustments InventoryAdjustment[]
+}
+
+// ======= PRODUCT =======
+model Product {
+  id       Int      @id @default(autoincrement())
+  name     String
+  category String?
+  price    Float
+  cost     Float
+  unit     String
+
+  saleItems SaleItem[]
+  inventory InventoryItem[]
+
+  adjustments InventoryAdjustment[]
+
+}
+
+// ======= INVENTORY ITEM =======
+model InventoryItem {
+  id        Int     @id @default(autoincrement())
+  quantity  Int     @default(0)
+  minStock  Int     @default(0)
+
+  event     Event   @relation(fields: [eventId], references: [id])
+  eventId   Int
+
+  bar       Bar     @relation(fields: [barId], references: [id])
+  barId     Int
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+}
+
+// ======= SALE =======
+model Sale {
+  id         Int      @id @default(autoincrement())
+  total      Float
+  createdAt  DateTime @default(now())
+  cancelled  Boolean  @default(false)
+  cancelledBy Int?
+  cancellationReason String?
+
+  event      Event    @relation(fields: [eventId], references: [id])
+  eventId    Int
+
+  bar        Bar      @relation(fields: [barId], references: [id])
+  barId      Int
+
+  cashier    User     @relation(fields: [userId], references: [id])
+  userId     Int
+
+  items      SaleItem[]
+}
+
+// ======= SALE ITEM =======
+model SaleItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  price     Float
+
+  sale      Sale     @relation(fields: [saleId], references: [id])
+  saleId    Int
+
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+}
+
+// ======= PAYMENT METHODS =======
+enum PaymentMethod {
+  CASH
+  CARD
+  COURTESY
+  TRANSFER
+}
+
+// ======= INVENTORY ADJUSTMENT =======
+model InventoryAdjustment {
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  reason    String?
+  type      AdjustmentType
+  createdAt DateTime @default(now())
+
+  event     Event   @relation(fields: [eventId], references: [id])
+  eventId   Int
+
+  bar       Bar     @relation(fields: [barId], references: [id])
+  barId     Int
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+}
+
+enum AdjustmentType {
+  LOSS
+  ENTRY
+  EXIT
+  CORRECTION
+}
+
+// ======= WAITER ASSIGNMENT =======
+model WaiterAssignment {
+  id        Int     @id @default(autoincrement())
+
+  event     Event   @relation(fields: [eventId], references: [id])
+  eventId   Int
+
+  bar       Bar?     @relation(fields: [barId], references: [id])
+  barId     Int?
+
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+}

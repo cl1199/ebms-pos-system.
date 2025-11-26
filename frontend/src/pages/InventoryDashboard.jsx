@@ -8,7 +8,7 @@ import InventoryAdjustModal from "../components/inventory/InventoryAdjustModal";
 import InventoryTransferModal from "../components/inventory/InventoryTransferModal";
 
 export default function InventoryDashboard() {
-  const eventId = 1; // temporal — luego lo conectamos con selector
+  const eventId = 1; // temporal
   const [barId, setBarId] = useState(1);
 
   const [inventory, setInventory] = useState([]);
@@ -25,18 +25,18 @@ export default function InventoryDashboard() {
   const loadData = async () => {
     try {
       // 1) INVENTARIO DE LA BARRA
-      const inv = await api.get(`/pos/inventory/bar/${eventId}/${barId}`);
+      const inv = await api.get(`/inventory/bar/${eventId}/${barId}`);
       setInventory(inv.data?.inventory || []);
 
-      // 2) INVENTARIO CRÍTICO (nuevo endpoint)
+      // 2) INVENTARIO CRÍTICO
       const low = await api.get(`/reports/inventory/critical?eventId=${eventId}`);
       setLowStock(low.data || []);
 
-      // 3) HISTORIAL DE MOVIMIENTOS
-      const hist = await api.get(`/pos/inventory/history/${eventId}/${barId}`);
+      // 3) HISTORIAL
+      const hist = await api.get(`/inventory/history/${eventId}/${barId}`);
       setHistory(hist.data?.history || []);
 
-      // 4) LISTA DE BARRAS POR EVENTO
+      // 4) BARRAS DEL EVENTO
       const barsRes = await api.get(`/bars/event/${eventId}`);
       setBars(barsRes.data?.bars || []);
 
@@ -55,7 +55,6 @@ export default function InventoryDashboard() {
 
   return (
     <div className="p-6 space-y-6 text-slate-100">
-
       {/* TÍTULO */}
       <h1 className="text-2xl font-semibold tracking-tight bg-gradient-to-r from-blue-300 to-sky-400 text-transparent bg-clip-text drop-shadow-lg">
         Inventario en Vivo
@@ -102,7 +101,7 @@ export default function InventoryDashboard() {
         </select>
       </div>
 
-      {/* TABLA */}
+      {/* TABLA INVENTARIO */}
       <div className="rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-xl p-4">
         <h2 className="text-sm font-semibold text-slate-200 mb-3">
           Inventario actual

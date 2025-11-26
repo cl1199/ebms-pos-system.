@@ -3,7 +3,6 @@ import { Routes, Route } from "react-router-dom";
 
 import DashboardLayout from "./layout/DashboardLayout";
 import Home from "./pages/Home";
-import EventDashboard from "./pages/EventDashboard";
 import InventoryDashboard from "./pages/InventoryDashboard";
 import SalesDashboard from "./pages/SalesDashboard";
 import POSPage from "./pages/POSPage";
@@ -12,6 +11,7 @@ import AdminEvents from "./pages/AdminEvents";
 import AdminBars from "./pages/AdminBars";
 import AdminAssignments from "./pages/AdminAssignments";
 import Login from "./pages/Login";
+import EventDashboard from "./pages/EventDashboard"
 
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import AdminRoute from "@/components/auth/AdminRoute";
@@ -38,12 +38,12 @@ export default function App() {
 
         {/* GESTIÓN DEL EVENTO (ADMIN + SUPERVISOR) */}
         <Route
-          path="event-dashboard"
-          element={
-            <SupervisorRoute>
-              <EventDashboard />
-            </SupervisorRoute>
-          }
+        path="event-dashboard"
+        element={
+        <SupervisorRoute>
+          <EventDashboard />
+          </SupervisorRoute>
+        }
         />
         <Route
           path="inventario"
